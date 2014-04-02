@@ -51,7 +51,7 @@
 //-- CoAP
 #include "rleds.h"
 //#include "rt.h"
-//#include "rex.h"
+#include "rex.h"
 //#include "rheli.h"
 //#include "rrube.h"
 //#include "rxl1.h"
@@ -120,7 +120,7 @@ void openwsn_init() {
    //-- CoAP
    //rleds_init();
    //rt_init();
-   //rex_init();
+   rex_init();
    //rheli_init();
    //rrube_init();
    //rxl1_init();
