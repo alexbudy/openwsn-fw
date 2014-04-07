@@ -29,6 +29,7 @@
 #include "openqueue_obj.h"
 #include "openrandom_obj.h"
 #include "uart_obj.h"
+#include "rex_obj.h"
 
 // notifications sent from the C mote to the Python BSP
 enum {
@@ -197,6 +198,8 @@ struct OpenMote {
    // kernel
    scheduler_vars_t     scheduler_vars;
    scheduler_dbg_t      scheduler_dbg;
+   // rex
+	 rex_vars_t						rex_vars;
 };
 
 #endif
