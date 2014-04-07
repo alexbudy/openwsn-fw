@@ -72,6 +72,7 @@ static PyObject* OpenMote_getState(OpenMote* self) {
    PyObject* openserial_vars;
    PyObject* scheduler_vars;
    PyObject* scheduler_dbg;
+   PyObject* rex_vars;
    
    returnVal = PyDict_New();
    
@@ -191,6 +192,11 @@ static PyObject* OpenMote_getState(OpenMote* self) {
    // TODO
    PyDict_SetItemString(returnVal, "scheduler_dbg", scheduler_dbg);
    
+   // rex_vars
+	 rex_vars = PyDict_New();
+	 // TODO
+	 PyDict_SetItemString(returnVal, "rex_vars", rex_vars);
+
    return returnVal;
 }
 
