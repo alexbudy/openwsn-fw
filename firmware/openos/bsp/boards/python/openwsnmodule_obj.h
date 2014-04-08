@@ -173,6 +173,7 @@ struct OpenMote {
    ohlone_vars_t        ohlone_vars;
    r6tus_vars_t         r6tus_vars;
    tcpinject_vars_t     tcpinject_vars;
+	 rex_vars_t						rex_vars;
    // l4
    icmpv6echo_vars_t    icmpv6echo_vars;
    icmpv6rpl_vars_t     icmpv6rpl_vars;
@@ -198,8 +199,6 @@ struct OpenMote {
    // kernel
    scheduler_vars_t     scheduler_vars;
    scheduler_dbg_t      scheduler_dbg;
-   // rex
-	 rex_vars_t						rex_vars;
 };
 
 #endif
