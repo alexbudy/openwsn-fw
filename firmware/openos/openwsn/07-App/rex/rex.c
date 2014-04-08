@@ -21,12 +21,6 @@ const uint8_t rex_path0[] = "rex";
 
 //=========================== variables =======================================
 
-typedef struct {
-   coap_resource_desc_t desc;
-   opentimer_id_t  timerId;
-} rex_vars_t;
-
-rex_vars_t rex_vars;
 
 //=========================== prototypes ======================================
 
