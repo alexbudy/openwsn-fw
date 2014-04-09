@@ -23,13 +23,19 @@
 #include "opencoap_obj.h"
 #include "opentcp_obj.h"
 #include "ohlone_obj.h"
-#include "r6tus_obj.h"
+#include "r6t_obj.h"
 #include "tcpinject_obj.h"
 #include "idmanager_obj.h"
 #include "openqueue_obj.h"
 #include "openrandom_obj.h"
 #include "uart_obj.h"
+<<<<<<< HEAD
 #include "rex_obj.h"
+=======
+#include "rinfo_obj.h"
+#include "rleds_obj.h"
+#include "rwellknown_obj.h"
+>>>>>>> upstream/develop
 
 // notifications sent from the C mote to the Python BSP
 enum {
@@ -63,6 +69,14 @@ enum {
    MOTE_NOTIF_debugpins_radio_toggle,
    MOTE_NOTIF_debugpins_radio_clr,
    MOTE_NOTIF_debugpins_radio_set,
+   MOTE_NOTIF_debugpins_ka_clr,
+   MOTE_NOTIF_debugpins_ka_set,
+   MOTE_NOTIF_debugpins_syncPacket_clr,
+   MOTE_NOTIF_debugpins_syncPacket_set,
+   MOTE_NOTIF_debugpins_syncAck_clr,
+   MOTE_NOTIF_debugpins_syncAck_set,
+   MOTE_NOTIF_debugpins_debug_clr,
+   MOTE_NOTIF_debugpins_debug_set,
    // eui64
    MOTE_NOTIF_eui64_get,
    // leds
@@ -168,12 +182,16 @@ struct OpenMote {
    bsp_timer_icb_t      bsp_timer_icb;
    radio_icb_t          radio_icb;
    radiotimer_icb_t     radiotimer_icb;
+<<<<<<< HEAD
    //===== state
    // l7
    ohlone_vars_t        ohlone_vars;
    r6tus_vars_t         r6tus_vars;
    tcpinject_vars_t     tcpinject_vars;
 	 rex_vars_t						rex_vars;
+=======
+   //===== stack
+>>>>>>> upstream/develop
    // l4
    icmpv6echo_vars_t    icmpv6echo_vars;
    icmpv6rpl_vars_t     icmpv6rpl_vars;
@@ -199,6 +217,22 @@ struct OpenMote {
    // kernel
    scheduler_vars_t     scheduler_vars;
    scheduler_dbg_t      scheduler_dbg;
+   //===== applications
+   //+++++ TCP
+   //- debug
+   tcpinject_vars_t     tcpinject_vars;
+   //- common
+   ohlone_vars_t        ohlone_vars;
+   //+++++ UDP
+   //- debug
+   //- common
+   //+++++ CoAP
+   //- debug
+   //- common
+   rinfo_vars_t         rinfo_vars;
+   rleds_vars_t         rleds_vars;
+   rwellknown_vars_t    rwellknown_vars;
+   r6t_vars_t           r6t_vars;
 };
 
 #endif

@@ -61,7 +61,7 @@ project:
     only from an amd64-linux build host.
     simhost      Host platform and OS for simulation. Default selection is
                  the current platform/OS, which of course is not a cross-
-                 build. x86-windows cross-build requires MinGW-w64 toolchain.
+                 build. '-windows' cross-builds require MinGW-w64 toolchain.
                  amd64-linux, x86-linux, amd64-windows, x86-windows
     simhostpy    Home directory for simhost cross-build Python headers and 
                  shared library.
@@ -88,13 +88,14 @@ command_line_options = {
         # MSP430
         'telosb',
         'gina',
-        'wsn430v14',
         'wsn430v13b',
+        'wsn430v14',
         'z1',
         # Cortex-M3
         'cc2538', # TODO: replace by openmotecc2538 when directory renamed
         'openmotestm',
         'iot-lab_M3',
+        'agilefox',
         # misc.
         'python',
     ],

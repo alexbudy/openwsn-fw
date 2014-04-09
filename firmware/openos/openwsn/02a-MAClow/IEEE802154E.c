@@ -606,7 +606,7 @@ port_INLINE bool ieee154e_processIEs(OpenQueueEntry_t* pkt, uint16_t * lenIE)
   uint8_t ptr,byte0,byte1;
   uint8_t temp_8b,gr_elem_id,subid;
   uint16_t temp_16b,len,sublen;
-  volatile PORT_SIGNED_INT_WIDTH  timeCorrection;
+  PORT_SIGNED_INT_WIDTH  timeCorrection;
   
   ptr=0;
   //candidate IE header  if type ==0 header IE if type==1 payload IE
@@ -681,8 +681,8 @@ port_INLINE bool ieee154e_processIEs(OpenQueueEntry_t* pkt, uint16_t * lenIE)
          byte1 = *((uint8_t*)(pkt->payload)+ptr);
          ptr++;
          
-         timeCorrection  = (PORT_SIGNED_INT_WIDTH)((PORT_RADIOTIMER_WIDTH)byte1<<8 | (PORT_RADIOTIMER_WIDTH)byte0);
-         timeCorrection /=  US_PER_TICK;
+         timeCorrection  = (int16_t)((uint16_t)byte1<<8 | (uint16_t)byte0);
+         timeCorrection  = (timeCorrection / (PORT_SIGNED_INT_WIDTH)US_PER_TICK);
          timeCorrection  = -timeCorrection;
          synchronizeAck(timeCorrection);
       }
@@ -1496,8 +1496,8 @@ port_INLINE void activity_ri6() {
    packetfunctions_reserveHeaderSize(ieee154e_vars.ackToSend,sizeof(ack_timecorrection_IE_t));
    timeCorrection  = -timeCorrection;
    timeCorrection *= US_PER_TICK;
-   ieee154e_vars.ackToSend->payload[0] = (uint8_t)((((PORT_RADIOTIMER_WIDTH)timeCorrection)   ) & 0xff);
-   ieee154e_vars.ackToSend->payload[1] = (uint8_t)((((PORT_RADIOTIMER_WIDTH)timeCorrection)>>8) & 0xff);
+   ieee154e_vars.ackToSend->payload[0] = (uint8_t)((((uint16_t)timeCorrection)   ) & 0xff);
+   ieee154e_vars.ackToSend->payload[1] = (uint8_t)((((uint16_t)timeCorrection)>>8) & 0xff);
    
    // add header IE header -- xv poipoi -- pkt is filled in reverse order..
    packetfunctions_reserveHeaderSize(ieee154e_vars.ackToSend,sizeof(header_IE_descriptor_t));
@@ -1786,6 +1786,11 @@ void synchronizePacket(PORT_RADIOTIMER_WIDTH timeReceived) {
    // update the stats
    ieee154e_stats.numSyncPkt++;
    updateStats(timeCorrection);
+
+#ifdef OPENSIM
+   debugpins_syncPacket_set();
+   debugpins_syncPacket_clr();
+#endif
 }
 
 void synchronizeAck(PORT_SIGNED_INT_WIDTH timeCorrection) {
@@ -1814,6 +1819,11 @@ void synchronizeAck(PORT_SIGNED_INT_WIDTH timeCorrection) {
    // update the stats
    ieee154e_stats.numSyncAck++;
    updateStats(timeCorrection);
+   
+#ifdef OPENSIM
+   debugpins_syncAck_set();
+   debugpins_syncAck_clr();
+#endif
 }
 
 void changeIsSync(bool newIsSync) {
