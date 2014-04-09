@@ -56,15 +56,12 @@
 //- common
 #include "rinfo.h"
 #include "rleds.h"
-<<<<<<< HEAD
 //#include "rt.h"
 #include "rex.h"
 //#include "rheli.h"
-=======
 #include "rwellknown.h"
 #include "r6t.h"
 //#include "rex.h"
->>>>>>> upstream/develop
 //#include "rrube.h"
 //#include "layerdebug.h"
 //- board-specific
@@ -131,13 +128,11 @@ void openwsn_init() {
    //udprand_init();
    //udplatency_init();
    //udpstorm_init();
-<<<<<<< HEAD
    //-- CoAP
    //rleds_init();
    //rt_init();
    rex_init();
    //rheli_init();
-=======
    //- board-specific
    //imu_init();
    //+++++ CoAP
@@ -150,7 +145,6 @@ void openwsn_init() {
    r6t_init();
    //rreg_init();
    //rex_init();
->>>>>>> upstream/develop
    //rrube_init();
    //layerdebug_init();
    //- board-specific
@@ -158,16 +152,9 @@ void openwsn_init() {
    //rt_init();
    //rxl1_init();
    
-<<<<<<< HEAD
-   openserial_printInfo(COMPONENT_OPENWSN,ERR_BOOTED,
-                            (errorparameter_t)0,
-                            (errorparameter_t)0);
-}
-=======
    openserial_printInfo(
       COMPONENT_OPENWSN,ERR_BOOTED,
       (errorparameter_t)0,
       (errorparameter_t)0
    );
 }
->>>>>>> upstream/develop
