@@ -291,8 +291,9 @@ elif env['toolchain']=='gcc':
         env.Append(CPPDEFINES = 'OPENSIM')
     
     if env['fastsim']==1:
+        print "INSIDE FASTSIM"
         env.Append(CPPDEFINES = 'FASTSIM')
-        #env.Append(CPPDEFINES = 'TRACE_ON')
+        env.Append(CPPDEFINES = 'TRACE_ON')
     
     if os.name!='nt':
         if env['simhost'].endswith('linux'):
