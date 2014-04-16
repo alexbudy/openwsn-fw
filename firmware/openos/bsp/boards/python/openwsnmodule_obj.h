@@ -33,6 +33,7 @@
 #include "rinfo_obj.h"
 #include "rleds_obj.h"
 #include "rwellknown_obj.h"
+#include "rex_obj.h"
 
 // notifications sent from the C mote to the Python BSP
 enum {
@@ -222,6 +223,7 @@ struct OpenMote {
    rleds_vars_t         rleds_vars;
    rwellknown_vars_t    rwellknown_vars;
    r6t_vars_t           r6t_vars;
+	 rex_vars_t           rex_vars;
 };
 
 #endif
