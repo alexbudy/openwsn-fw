@@ -15,6 +15,7 @@
 #include "opentimers_obj.h"
 #include "scheduler_obj.h"
 #include "IEEE802154E_obj.h"
+#include "adaptive_sync_obj.h"
 #include "neighbors_obj.h"
 #include "res_obj.h"
 #include "schedule_obj.h"
@@ -33,6 +34,7 @@
 #include "rinfo_obj.h"
 #include "rleds_obj.h"
 #include "rwellknown_obj.h"
+#include "rex_obj.h"
 
 // notifications sent from the C mote to the Python BSP
 enum {
@@ -195,6 +197,7 @@ struct OpenMote {
    schedule_vars_t      schedule_vars;
    schedule_dbg_t       schedule_dbg;
    // l2a
+   adaptive_sync_vars_t adaptive_sync_vars;
    ieee154e_vars_t      ieee154e_vars;
    ieee154e_stats_t     ieee154e_stats;
    ieee154e_dbg_t       ieee154e_dbg;
@@ -224,6 +227,7 @@ struct OpenMote {
    rleds_vars_t         rleds_vars;
    rwellknown_vars_t    rwellknown_vars;
    r6t_vars_t           r6t_vars;
+	 rex_vars_t           rex_vars;
 };
 
 #endif
