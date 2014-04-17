@@ -30,7 +30,6 @@
 #include "openqueue_obj.h"
 #include "openrandom_obj.h"
 #include "uart_obj.h"
-#include "rex_obj.h"
 #include "rinfo_obj.h"
 #include "rleds_obj.h"
 #include "rwellknown_obj.h"
@@ -181,9 +180,6 @@ struct OpenMote {
    bsp_timer_icb_t      bsp_timer_icb;
    radio_icb_t          radio_icb;
    radiotimer_icb_t     radiotimer_icb;
-   //===== state
-   // l7
-	 rex_vars_t						rex_vars;
    //===== stack
    // l4
    icmpv6echo_vars_t    icmpv6echo_vars;
@@ -227,7 +223,7 @@ struct OpenMote {
    rleds_vars_t         rleds_vars;
    rwellknown_vars_t    rwellknown_vars;
    r6t_vars_t           r6t_vars;
-	 rex_vars_t           rex_vars;
+	 rex_vars_t						rex_vars;
 };
 
 #endif

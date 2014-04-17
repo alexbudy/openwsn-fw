@@ -1,7 +1,7 @@
 #ifndef __REX_H
 #define __REX_H
 
-
+#include "opencoap.h"
 
 /**
 \addtogroup AppUdp
@@ -9,8 +9,6 @@
 \addtogroup rT
 \{
 */
-
-#include "opencoap.h"
 
 //=========================== define ==========================================
 

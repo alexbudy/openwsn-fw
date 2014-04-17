@@ -57,9 +57,6 @@
 //- common
 #include "rinfo.h"
 #include "rleds.h"
-//#include "rt.h"
-#include "rex.h"
-//#include "rheli.h"
 #include "rwellknown.h"
 #include "r6t.h"
 #include "rex.h"
@@ -130,11 +127,6 @@ void openwsn_init() {
    //udprand_init();
    //udplatency_init();
    //udpstorm_init();
-   //-- CoAP
-   //rleds_init();
-   //rt_init();
-   rex_init();
-   //rheli_init();
    //- board-specific
    //imu_init();
    //+++++ CoAP
