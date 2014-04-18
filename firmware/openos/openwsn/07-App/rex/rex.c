@@ -26,6 +26,9 @@ const uint8_t rex_path0[] = "rex";
 //=========================== variables =======================================
 
 
+rex_vars_t rex_vars;
+
+
 //=========================== prototypes ======================================
 
 owerror_t rex_receive(OpenQueueEntry_t* msg,
