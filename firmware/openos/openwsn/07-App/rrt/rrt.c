@@ -84,14 +84,25 @@ owerror_t rrt_receive(
          
          //=== prepare  CoAP response
          
-         packetfunctions_reserveHeaderSize(msg,6);
-         msg->payload[0] = 'p';
-         msg->payload[1] = 'o';
-         msg->payload[2] = 'i';
-         msg->payload[3] = 'p';
-         msg->payload[4] = 'o';
-         msg->payload[5] = 'i';
-         
+				 //ip from
+         packetfunctions_reserveHeaderSize(msg,4);
+         msg->payload[0] = 'f';
+         msg->payload[1] = 'r';
+         msg->payload[2] = 'o';
+         msg->payload[3] = 'm';
+
+				 //ip to
+         packetfunctions_reserveHeaderSize(msg,1);
+         msg->payload[0] = '\n';
+
+				 //ip destination
+         packetfunctions_reserveHeaderSize(msg,1);
+         msg->payload[0] = 'd';
+
+				 //message
+         packetfunctions_reserveHeaderSize(msg,1);
+         msg->payload[0] = 'm';
+
          // payload marker
          packetfunctions_reserveHeaderSize(msg,1);
          msg->payload[0] = COAP_PAYLOAD_MARKER;
