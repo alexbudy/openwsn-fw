@@ -20,6 +20,8 @@ const uint8_t rrt_path0[] = "rt";
 
 rrt_vars_t rrt_vars;
 
+uint8_t * tmp_payload;
+
 //=========================== prototypes ======================================
 
 owerror_t     rrt_receive(
@@ -27,9 +29,15 @@ owerror_t     rrt_receive(
    coap_header_iht*  coap_header,
    coap_option_iht*  coap_options
 );
+
 void          rrt_sendDone(
    OpenQueueEntry_t* msg,
    owerror_t error
+);
+
+uint8_t *  getIPFromPayload(
+	uint8_t* payload,
+	int      ip_to_get 
 );
 
 //=========================== public ==========================================
@@ -42,7 +50,7 @@ void rrt_init() {
    // do not run if DAGroot
    if(idmanager_getIsDAGroot()==TRUE) return; 
    
-   // prepare the resource descriptor for the /i path
+   // prepare the resource descriptor for the /rt path
    rrt_vars.desc.path0len             = sizeof(rrt_path0)-1;
    rrt_vars.desc.path0val             = (uint8_t*)(&rrt_path0);
    rrt_vars.desc.path1len             = 0;
@@ -95,7 +103,7 @@ owerror_t rrt_receive(
          packetfunctions_reserveHeaderSize(msg,1);
          msg->payload[0] = '\n';
 
-				 //ip destination
+				 //ip next destination
          packetfunctions_reserveHeaderSize(msg,1);
          msg->payload[0] = 'd';
 
@@ -112,12 +120,52 @@ owerror_t rrt_receive(
          
          outcome                          = E_SUCCESS;
          break;
+			case COAP_CODE_REQ_PUT:
+			case COAP_CODE_REQ_POST:
+				 tmp_payload = getIPFromPayload(msg->payload, COAP_GET_TO_IP);
+
+				 msg->payload 										= &(msg->packet[127]);
+				 msg->length											= 0;
+
+				 packetfunctions_reserveHeaderSize(msg, 4);
+				 msg->payload[0]									= COAP_PAYLOAD_MARKER;
+				 msg->payload[1] = 'x';
+				 msg->payload[2] = tmp_payload[0];
+				 msg->payload[3] = tmp_payload[1];
+
+         // set the CoAP header
+         coap_header->Code                = COAP_CODE_RESP_CHANGED;
+
+				 outcome													= E_SUCCESS;
+				 break;
       default:
          // return an error message
          outcome = E_FAIL;
    }
    
    return outcome;
+}
+
+uint8_t * getIPFromPayload(uint8_t* payload, int msg) {
+	uint8_t * newPtr = payload;
+	switch (msg) {
+		case COAP_GET_FROM_IP:
+			newPtr = newPtr + 0;
+			break;
+		case COAP_GET_TO_IP:
+			newPtr = newPtr + 1;
+			break;
+		case COAP_GET_NEXT_IP:
+			newPtr = newPtr + 2;
+			break;
+		case COAP_GET_MSG:
+			newPtr = newPtr + 3;
+			break;
+		default:
+			break;
+	}
+
+	return newPtr;
 }
 
 /**
