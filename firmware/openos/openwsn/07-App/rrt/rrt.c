@@ -40,6 +40,8 @@ uint8_t *  getIPFromPayload(
 	int      ip_to_get 
 );
 
+void rotateState();
+
 //=========================== public ==========================================
 
 /**
@@ -58,6 +60,9 @@ void rrt_init() {
    rrt_vars.desc.componentID          = COMPONENT_RRT;
    rrt_vars.desc.callbackRx           = &rrt_receive;
    rrt_vars.desc.callbackSendDone     = &rrt_sendDone;
+
+   //initialize state
+   rrt_vars.STATE                     = 0;
    
    // register with the CoAP module
    opencoap_register(&rrt_vars.desc);
@@ -75,16 +80,20 @@ void rrt_init() {
 
 \return Whether the response is prepared successfully.
 */
+
 owerror_t rrt_receive(
       OpenQueueEntry_t* msg,
       coap_header_iht* coap_header,
       coap_option_iht* coap_options
    ) {
    
+   OpenQueueEntry_t* pkt;
+   uint8_t numOptions;
    owerror_t outcome;
    
    switch (coap_header->Code) {
       case COAP_CODE_REQ_GET:
+         rotateState(&rrt_vars.STATE);
          
          //=== reset packet payload (we will reuse this packetBuffer)
          msg->payload                     = &(msg->packet[127]);
@@ -92,24 +101,9 @@ owerror_t rrt_receive(
          
          //=== prepare  CoAP response
          
-				 //ip from
-         packetfunctions_reserveHeaderSize(msg,4);
-         msg->payload[0] = 'f';
-         msg->payload[1] = 'r';
-         msg->payload[2] = 'o';
-         msg->payload[3] = 'm';
-
-				 //ip to
+	    //ip from
          packetfunctions_reserveHeaderSize(msg,1);
-         msg->payload[0] = '\n';
-
-				 //ip next destination
-         packetfunctions_reserveHeaderSize(msg,1);
-         msg->payload[0] = 'd';
-
-				 //message
-         packetfunctions_reserveHeaderSize(msg,1);
-         msg->payload[0] = 'm';
+         msg->payload[0] = '0' + rrt_vars.STATE;
 
          // payload marker
          packetfunctions_reserveHeaderSize(msg,1);
@@ -120,30 +114,55 @@ owerror_t rrt_receive(
          
          outcome                          = E_SUCCESS;
          break;
-			case COAP_CODE_REQ_PUT:
-			case COAP_CODE_REQ_POST:
-				 tmp_payload = getIPFromPayload(msg->payload, COAP_GET_TO_IP);
+      case COAP_CODE_REQ_PUT:
+      case COAP_CODE_REQ_POST:
+          tmp_payload = getIPFromPayload(msg->packet, COAP_GET_FROM_IP);
 
-				 msg->payload 										= &(msg->packet[127]);
-				 msg->length											= 0;
+          msg->payload 										= &(msg->packet[127]);
+          msg->length											= 0;
 
-				 packetfunctions_reserveHeaderSize(msg, 4);
-				 msg->payload[0]									= COAP_PAYLOAD_MARKER;
-				 msg->payload[1] = 'x';
-				 msg->payload[2] = tmp_payload[0];
-				 msg->payload[3] = tmp_payload[1];
+          packetfunctions_reserveHeaderSize(msg, 4);
+          msg->payload[0] = 'x';
+          msg->payload[1] = 'y';
+          msg->payload[2] = 'z';
+          msg->payload[3] = tmp_payload[0];
+          
+          // payload marker
+          packetfunctions_reserveHeaderSize(msg,1);
+          msg->payload[0] = COAP_PAYLOAD_MARKER;
 
-         // set the CoAP header
-         coap_header->Code                = COAP_CODE_RESP_CHANGED;
+          // set the CoAP header
+          coap_header->Code                = COAP_CODE_RESP_CONTENT;
 
-				 outcome													= E_SUCCESS;
-				 break;
+          outcome													= E_SUCCESS;
+          break;
       default:
          // return an error message
          outcome = E_FAIL;
    }
    
    return outcome;
+}
+
+//add more states as needed
+//TODO
+void rotateState(uint8_t * state) {
+    
+   switch(*state) {
+        case 0:
+            *state = 1;
+            break;
+        case 1:
+            *state = 2;
+            break;
+        case 2:
+            *state = 0;
+            break;
+        default:
+            *state = 0;
+            break;
+   } 
+
 }
 
 uint8_t * getIPFromPayload(uint8_t* payload, int msg) {

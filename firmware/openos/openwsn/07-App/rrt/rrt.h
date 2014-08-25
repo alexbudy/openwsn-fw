@@ -15,7 +15,7 @@
 #define COAP_GET_FROM_IP 			97
 #define COAP_GET_TO_IP 				2
 #define COAP_GET_NEXT_IP 			3
-#define COAP_GET_MSG		 			4
+#define COAP_GET_MSG	 			4
 
 
 //=========================== typedef =========================================
@@ -24,6 +24,7 @@
 
 typedef struct {
    coap_resource_desc_t desc;
+   uint8_t STATE; 
 } rrt_vars_t;
 
 
