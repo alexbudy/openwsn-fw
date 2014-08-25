@@ -25,6 +25,7 @@
 typedef struct {
    coap_resource_desc_t desc;
    uint8_t STATE; 
+   char last_mssg;
 } rrt_vars_t;
 
 
