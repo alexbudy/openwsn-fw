@@ -65,6 +65,7 @@ void rrt_init() {
    //initialize state
    rrt_vars.STATE                     = 0;
    rrt_vars.last_mssg                 = 'a';
+   rrt_vars.mssg_sent                 = 0;
    
    // register with the CoAP module
    opencoap_register(&rrt_vars.desc);
@@ -132,51 +133,57 @@ owerror_t rrt_receive(
           msg->payload[3] = tmp_payload[0];
           rrt_vars.last_mssg = tmp_payload[0];
 
-          pkt = openqueue_getFreePacketBuffer(COMPONENT_RRT);
-          if (pkt == NULL) {
-              openserial_printError(COMPONENT_REX,ERR_NO_FREE_PACKET_BUFFER,
-                                    (errorparameter_t)0,
-                                    (errorparameter_t)0);
-              openqueue_freePacketBuffer(pkt);
-              return;
+          if (rrt_vars.mssg_sent == 0) {
+              pkt = openqueue_getFreePacketBuffer(COMPONENT_RRT);
+              if (pkt == NULL) {
+                  openserial_printError(COMPONENT_REX,ERR_NO_FREE_PACKET_BUFFER,
+                                        (errorparameter_t)0,
+                                        (errorparameter_t)0);
+                  openqueue_freePacketBuffer(pkt);
+                  return;
+              }
+
+              pkt->creator   = COMPONENT_RRT;
+              pkt->owner      = COMPONENT_RRT;
+
+              packetfunctions_reserveHeaderSize(pkt, PAYLOADLEN);
+              for (i=0; i<PAYLOADLEN; i++) {
+                 pkt->payload[i] = i;
+              }
+              pkt->payload[0] = 'g';
+              pkt->payload[1] = 'h';
+              pkt->payload[2] = 'j';
+
+              numOptions = 0;
+              /*
+              // location path option
+              packetfunctions_reserveHeaderSize(pkt,sizeof(rrt_path0)-1);
+              memcpy(&pkt->payload[0],&rrt_path0,sizeof(rrt_path0)-1);
+              packetfunctions_reserveHeaderSize(pkt,1);
+              pkt->payload[0]                  = (COAP_OPTION_NUM_URIPATH) << 4 |
+                 sizeof(rrt_path0)-1;
+              numOptions++;
+              // content-type option
+              packetfunctions_reserveHeaderSize(pkt,2);
+              pkt->payload[0]                  = COAP_OPTION_NUM_CONTENTFORMAT << 4 | 1;
+              pkt->payload[1]                  = COAP_MEDTYPE_APPOCTETSTREAM;
+              numOptions++;
+              */
+
+              //metada
+              pkt->l4_destination_port   = WKP_UDP_COAP; //5683
+              pkt->l3_destinationAdd.type = ADDR_128B;
+              memcpy(&pkt->l3_destinationAdd.addr_128b[0], &ipAddr_simMotes, 16);
+              //send
+              outcome = opencoap_send(pkt,
+                                      COAP_TYPE_NON,
+                                      COAP_CODE_REQ_PUT,
+                                      numOptions,
+                                      &rrt_vars.desc); //change port dest here?
+              
+              rrt_vars.mssg_sent = 1;
           }
 
-          pkt->creator   = COMPONENT_RRT;
-          pkt->owner      = COMPONENT_RRT;
-
-          packetfunctions_reserveHeaderSize(pkt, PAYLOADLEN);
-          for (i=0; i<PAYLOADLEN; i++) {
-             pkt->payload[i] = i;
-          }
-          pkt->payload[0] = 'g';
-          pkt->payload[1] = 'h';
-          pkt->payload[2] = 'j';
-
-          numOptions = 0;
-          // location path option
-          packetfunctions_reserveHeaderSize(pkt,sizeof(rrt_path0)-1);
-          memcpy(&pkt->payload[0],&rrt_path0,sizeof(rrt_path0)-1);
-          packetfunctions_reserveHeaderSize(pkt,1);
-          pkt->payload[0]                  = (COAP_OPTION_NUM_URIPATH) << 4 |
-             sizeof(rrt_path0)-1;
-          numOptions++;
-          // content-type option
-          packetfunctions_reserveHeaderSize(pkt,2);
-          pkt->payload[0]                  = COAP_OPTION_NUM_CONTENTFORMAT << 4 | 1;
-          pkt->payload[1]                  = COAP_MEDTYPE_APPOCTETSTREAM;
-          numOptions++;
-
-          //metada
-          pkt->l4_destination_port   = WKP_UDP_COAP; //5683
-          pkt->l3_destinationAdd.type = ADDR_128B;
-          memcpy(&pkt->l3_destinationAdd.addr_128b[0], &ipAddr_simMotes, 16);
-          //send
-          outcome = opencoap_send(pkt,
-                                  COAP_TYPE_NON,
-                                  COAP_CODE_REQ_PUT,
-                                  numOptions,
-                                  &rrt_vars.desc); //change port dest here?
-          
           // payload marker
           packetfunctions_reserveHeaderSize(msg,1);
           msg->payload[0] = COAP_PAYLOAD_MARKER;
