@@ -179,7 +179,7 @@ owerror_t rrt_receive(
                                       COAP_TYPE_NON,
                                       COAP_CODE_REQ_PUT,
                                       numOptions,
-                                      &rrt_vars.desc); //change port dest here?
+                                      &rrt_vars.desc);
               
               rrt_vars.mssg_sent = 1;
           }
