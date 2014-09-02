@@ -133,7 +133,6 @@ owerror_t rrt_receive(
           msg->payload[3] = tmp_payload[0];
           rrt_vars.last_mssg = tmp_payload[0];
 
-          if (rrt_vars.mssg_sent == 0) {
               pkt = openqueue_getFreePacketBuffer(COMPONENT_RRT);
               if (pkt == NULL) {
                   openserial_printError(COMPONENT_REX,ERR_NO_FREE_PACKET_BUFFER,
@@ -150,25 +149,9 @@ owerror_t rrt_receive(
               for (i=0; i<PAYLOADLEN; i++) {
                  pkt->payload[i] = i;
               }
-              pkt->payload[0] = 'g';
+              pkt->payload[0] = rrt_vars.last_mssg;
               pkt->payload[1] = 'h';
               pkt->payload[2] = 'j';
-
-              numOptions = 0;
-              /*
-              // location path option
-              packetfunctions_reserveHeaderSize(pkt,sizeof(rrt_path0)-1);
-              memcpy(&pkt->payload[0],&rrt_path0,sizeof(rrt_path0)-1);
-              packetfunctions_reserveHeaderSize(pkt,1);
-              pkt->payload[0]                  = (COAP_OPTION_NUM_URIPATH) << 4 |
-                 sizeof(rrt_path0)-1;
-              numOptions++;
-              // content-type option
-              packetfunctions_reserveHeaderSize(pkt,2);
-              pkt->payload[0]                  = COAP_OPTION_NUM_CONTENTFORMAT << 4 | 1;
-              pkt->payload[1]                  = COAP_MEDTYPE_APPOCTETSTREAM;
-              numOptions++;
-              */
 
               //metada
               pkt->l4_destination_port   = WKP_UDP_COAP; //5683
@@ -182,7 +165,6 @@ owerror_t rrt_receive(
                                       &rrt_vars.desc);
               
               rrt_vars.mssg_sent = 1;
-          }
 
           // payload marker
           packetfunctions_reserveHeaderSize(msg,1);
