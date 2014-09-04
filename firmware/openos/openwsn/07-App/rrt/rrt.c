@@ -15,7 +15,7 @@
 //=========================== defines =========================================
 
 const uint8_t rrt_path0[] = "rt";
-#define PAYLOADLEN  5
+#define PAYLOADLEN  2
 
 //=========================== variables =======================================
 
@@ -65,7 +65,6 @@ void rrt_init() {
    //initialize state
    rrt_vars.STATE                     = 0;
    rrt_vars.last_mssg                 = 'a';
-   rrt_vars.mssg_sent                 = 0;
    
    // register with the CoAP module
    opencoap_register(&rrt_vars.desc);
@@ -120,6 +119,18 @@ owerror_t rrt_receive(
          outcome                          = E_SUCCESS;
          break;
       case COAP_CODE_REQ_PUT:
+          //PUT - receives message from last mote
+          //simply save the first char received
+
+          //this is just for debugging purposes
+          openserial_printError(COMPONENT_RRT, ERR_NO_FREE_PACKET_BUFFER,
+                                (errorparameter_t)0,
+                                (errorparameter_t)0);
+
+          rrt_vars.last_mssg = msg->payload[0];
+
+          break;
+
       case COAP_CODE_REQ_POST:
           tmp_payload = getIPFromPayload(msg->payload, COAP_GET_FROM_IP);
 
@@ -135,7 +146,7 @@ owerror_t rrt_receive(
 
               pkt = openqueue_getFreePacketBuffer(COMPONENT_RRT);
               if (pkt == NULL) {
-                  openserial_printError(COMPONENT_REX,ERR_NO_FREE_PACKET_BUFFER,
+                  openserial_printError(COMPONENT_RRT,ERR_NO_FREE_PACKET_BUFFER,
                                         (errorparameter_t)0,
                                         (errorparameter_t)0);
                   openqueue_freePacketBuffer(pkt);
@@ -151,9 +162,6 @@ owerror_t rrt_receive(
               }
               pkt->payload[0] = rrt_vars.last_mssg;
               pkt->payload[1] = 'h';
-              pkt->payload[2] = 'j';
-              pkt->payload[3] = 'k';
-              pkt->payload[4] = 'l';
 
                numOptions = 0;
                // location-path option
@@ -181,7 +189,6 @@ owerror_t rrt_receive(
                                       numOptions,
                                       &rrt_vars.desc);
               
-              rrt_vars.mssg_sent = 1;
 
               if (outcome == E_FAIL) {
                 openqueue_freePacketBuffer(pkt);
