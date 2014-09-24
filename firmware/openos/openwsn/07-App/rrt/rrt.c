@@ -123,7 +123,7 @@ owerror_t rrt_receive(
           //simply save the first char received
 
           //this is just for debugging purposes
-          openserial_printError(COMPONENT_RRT, ERR_NO_FREE_PACKET_BUFFER,
+          openserial_printError(COMPONENT_RRT, ERR_BUSY_SENDING,
                                 (errorparameter_t)0,
                                 (errorparameter_t)0);
 
@@ -146,7 +146,7 @@ owerror_t rrt_receive(
 
               pkt = openqueue_getFreePacketBuffer(COMPONENT_RRT);
               if (pkt == NULL) {
-                  openserial_printError(COMPONENT_RRT,ERR_NO_FREE_PACKET_BUFFER,
+                  openserial_printError(COMPONENT_RRT,ERR_BUSY_SENDING,
                                         (errorparameter_t)0,
                                         (errorparameter_t)0);
                   openqueue_freePacketBuffer(pkt);
@@ -155,6 +155,7 @@ owerror_t rrt_receive(
 
               pkt->creator   = COMPONENT_RRT;
               pkt->owner      = COMPONENT_RRT;
+              pkt->l4_protocol  = IANA_UDP;
 
               packetfunctions_reserveHeaderSize(pkt, PAYLOADLEN);
               for (i=0; i<PAYLOADLEN; i++) {

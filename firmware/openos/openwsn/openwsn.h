@@ -88,6 +88,7 @@ enum {
    WKP_UDP_DISCARD                     =     9,
    WKP_UDP_RAND                        = 61000,
    WKP_UDP_LATENCY                     = 61001,
+   WKP_UDP_RINGMASTER                  = 15000,
 };
 
 //status elements
