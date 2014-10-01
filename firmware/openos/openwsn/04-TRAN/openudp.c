@@ -43,6 +43,13 @@ void openudp_sendDone(OpenQueueEntry_t* msg, owerror_t error) {
       case WKP_UDP_COAP:
          opencoap_sendDone(msg,error);
          break;
+      case WKP_UDP_RINGMASTER:
+         udpprint_sendDone(msg,error);
+         //udpringmaster_sendDone(msg, error);
+         break;
+      case WKP_UDP_NORESPONSE:
+         openqueue_freePacketBuffer(msg);
+         break;
       /*    
       case WKP_UDP_HELI:
          appudpheli_sendDone(msg,error);
@@ -122,6 +129,23 @@ void openudp_receive(OpenQueueEntry_t* msg) {
    switch(msg->l4_destination_port) {
       case WKP_UDP_COAP:
          opencoap_receive(msg);
+         break;
+      case WKP_UDP_RINGMASTER:
+         if (msg->payload[5] != 'D') {
+           openserial_printError(
+              COMPONENT_UDPPRINT,
+              //ERR_UNEXPECTED_SENDDONE,
+              0x15,
+              (errorparameter_t)0,
+              (errorparameter_t)0
+           );
+            udpprint_receive(msg);
+         } else {
+            openqueue_freePacketBuffer(msg);
+         }
+         break;
+      case WKP_UDP_NORESPONSE:
+         openqueue_freePacketBuffer(msg);
          break;
       /* 
       case WKP_UDP_HELI:
