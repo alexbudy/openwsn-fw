@@ -89,7 +89,8 @@ enum {
    WKP_UDP_RAND                        = 61000,
    WKP_UDP_LATENCY                     = 61001,
    WKP_UDP_RINGMASTER                  = 15000,
-   WKP_UDP_NORESPONSE                  = 15001,
+   WKP_UDP_MOTES                       = 15001,
+   WKP_UDP_NORESPONSE                  = 15002,
 };
 
 //status elements

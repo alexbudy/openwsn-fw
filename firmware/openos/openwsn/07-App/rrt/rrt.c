@@ -42,6 +42,8 @@ uint8_t *  getIPFromPayload(
 );
 
 void rotateState();
+void sendPacketToRingmaster(char msg);
+void sendPacketToMote(char msg, uint8_t mote);
 
 //=========================== public ==========================================
 
@@ -116,6 +118,7 @@ owerror_t rrt_receive(
          // set the CoAP header
          coap_header->Code                = COAP_CODE_RESP_CONTENT;
 
+         
          pkt = openqueue_getFreePacketBuffer(COMPONENT_RRT);
          if (pkt == NULL) {
              openserial_printError(COMPONENT_RRT,ERR_BUSY_SENDING,
@@ -130,7 +133,7 @@ owerror_t rrt_receive(
          pkt->l4_protocol  = IANA_UDP;
 
          packetfunctions_reserveHeaderSize(pkt, 1);
-         pkt->payload[0] = 'D'; //D stands for DISCOVERY
+         pkt->payload[0] = msg; //D stands for DISCOVERY
 
          numOptions = 0;
          // location-path option
@@ -152,14 +155,13 @@ owerror_t rrt_receive(
          pkt->l4_sourcePortORicmpv6Type   = WKP_UDP_RINGMASTER;
          pkt->l3_destinationAdd.type = ADDR_128B;
          memcpy(&pkt->l3_destinationAdd.addr_128b[0], &ipAddr_localhost, 16);
+
          //send
          outcome = openudp_send(pkt);
-         
 
          if (outcome == E_FAIL) {
            openqueue_freePacketBuffer(pkt);
          }
-         
          outcome                          = E_SUCCESS;
          break;
       case COAP_CODE_REQ_PUT:
@@ -173,6 +175,7 @@ owerror_t rrt_receive(
                                 (errorparameter_t)0);
 
           rrt_vars.last_mssg = msg->payload[0];
+          outcome                         = E_SUCCESS;
 
           break;
 
@@ -189,6 +192,19 @@ owerror_t rrt_receive(
           msg->payload[3] = tmp_payload[0];
           rrt_vars.last_mssg = tmp_payload[0];
 
+          if (tmp_payload[0] == 'P') { //P - perform an action
+              //palce holder for doing an action 
+              openserial_printError(COMPONENT_RRT,ERR_BUSY_SENDING,
+                                    (errorparameter_t)0,
+                                    (errorparameter_t)0);
+              //send message back to RM saying done
+              
+          } else if (tmp_payload[0] == 'F') {
+              //send a packet to next mote here telling action
+
+          } else  {
+              //neither perform an action nor forward a packet, so no actio needed
+          }
           pkt = openqueue_getFreePacketBuffer(COMPONENT_RRT);
           if (pkt == NULL) {
               openserial_printError(COMPONENT_RRT,ERR_BUSY_SENDING,
@@ -202,12 +218,8 @@ owerror_t rrt_receive(
           pkt->owner      = COMPONENT_RRT;
           pkt->l4_protocol  = IANA_UDP;
 
-          packetfunctions_reserveHeaderSize(pkt, PAYLOADLEN);
-          for (i=0; i<PAYLOADLEN; i++) {
-             pkt->payload[i] = i;
-          }
-          pkt->payload[0] = rrt_vars.last_mssg;
-          pkt->payload[1] = 'h';
+          packetfunctions_reserveHeaderSize(pkt, 1);
+          pkt->payload[0] = 'D';
 
            numOptions = 0;
            // location-path option
@@ -236,7 +248,7 @@ owerror_t rrt_receive(
           if (outcome == E_FAIL) {
             openqueue_freePacketBuffer(pkt);
           }
-
+          
           // payload marker
           packetfunctions_reserveHeaderSize(msg,1);
           msg->payload[0] = COAP_PAYLOAD_MARKER;
@@ -252,6 +264,63 @@ owerror_t rrt_receive(
    }
    
    return outcome;
+}
+
+//send packet to ringmaster
+void sendPacketToRingmaster(char msg) {
+     OpenQueueEntry_t* pkt2;
+     uint8_t numOpts;
+     owerror_t outcome2;
+     /*
+
+     pkt2 = openqueue_getFreePacketBuffer(COMPONENT_RRT);
+     if (pkt2 == NULL) {
+         openserial_printError(COMPONENT_RRT,ERR_BUSY_SENDING,
+                               (errorparameter_t)0,
+                               (errorparameter_t)0);
+         openqueue_freePacketBuffer(pkt2);
+         return;
+     }
+
+     pkt->creator   = COMPONENT_RRT;
+     pkt->owner      = COMPONENT_RRT;
+     pkt->l4_protocol  = IANA_UDP;
+
+     packetfunctions_reserveHeaderSize(pkt, 1);
+     pkt->payload[0] = msg; //D stands for DISCOVERY
+
+     numOptions = 0;
+     // location-path option
+     packetfunctions_reserveHeaderSize(pkt,sizeof(rrt_path0)-1);
+     memcpy(&pkt->payload[0],&rrt_path0,sizeof(rrt_path0)-1);
+     packetfunctions_reserveHeaderSize(pkt,1);
+     pkt->payload[0]                  = (COAP_OPTION_NUM_URIPATH) << 4 |
+        sizeof(rrt_path0)-1;
+     numOptions++;
+     // content-type option
+     packetfunctions_reserveHeaderSize(pkt,2);
+     pkt->payload[0]                  = COAP_OPTION_NUM_CONTENTFORMAT << 4 |
+        1;
+     pkt->payload[1]                  = COAP_MEDTYPE_APPOCTETSTREAM;
+     numOptions++;
+
+     //metada
+     pkt->l4_destination_port   = WKP_UDP_RINGMASTER;
+     pkt->l4_sourcePortORicmpv6Type   = WKP_UDP_RINGMASTER;
+     pkt->l3_destinationAdd.type = ADDR_128B;
+     memcpy(&pkt->l3_destinationAdd.addr_128b[0], &ipAddr_localhost, 16);
+
+     //send
+     outcome = openudp_send(pkt);
+
+     if (outcome == E_FAIL) {
+       openqueue_freePacketBuffer(pkt);
+     }
+    */
+}
+
+void sendPacketToMote(char msg, uint8_t mote) {
+
 }
 
 //add more states as needed
