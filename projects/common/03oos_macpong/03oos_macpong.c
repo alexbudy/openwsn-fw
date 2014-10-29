@@ -150,6 +150,8 @@ void c6t_init(void)               { return; }
 void cinfo_init(void)             { return; }
 void cleds__init(void)            { return; }
 void cwellknown_init(void)        { return; }
+
+void rrt_init(void)               { return; }
    // TCP
 void techo_init(void)             { return; }
    // UDP
